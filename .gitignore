@@ -1,0 +1,6 @@
+*.DS_Store
+*.xls
+
+.ipynb_checkpoints/
+data/SIRFOSC/*
+data/A14-RMS/test/*
