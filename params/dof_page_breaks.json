@@ -1,0 +1,21 @@
+{
+    "2021": {
+        "parse": {
+            "start": {
+                "pages": "3",
+                "top-left": ["115", "528"],
+                "bottom-right": ["528", "57"]
+            },
+            "end": {
+                "pages": "300",
+                "top-left": ["115", "738"],
+                "bottom-right": ["528", "450"]
+            },
+            "full": {
+                "pages": "4-299",
+                "top-left": ["115", "738"],
+                "bottom-right": ["528", "57"]
+            }
+        }
+    }
+}
