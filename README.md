@@ -20,7 +20,7 @@ You will require the use of [ghostscript](https://www.ghostscript.com/doc/9.27/I
 TBD
 
 ## ===== Open Source =====
-This project is possible thanks to Open Source the following projects (please consider donate/sponsor if you can):
+This project is possible thanks to the following Open Source projects (please consider donate/sponsor if you can):
 
 - [Python Software Foundation](https://www.python.org/psf/) ([donate](https://psfmember.org/civicrm/contribute/transact?reset=1&id=2))
 - [Requests](https://github.com/psf/requests) ([sponsor](https://www.python.org/psf/sponsorship/))
