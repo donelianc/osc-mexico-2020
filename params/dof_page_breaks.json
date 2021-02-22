@@ -3,7 +3,7 @@
         "parse": {
             "start": {
                 "pages": "3",
-                "top-left": ["115", "528"],
+                "top-left": ["115", "629"],
                 "bottom-right": ["528", "57"]
             },
             "end": {
@@ -13,6 +13,25 @@
             },
             "full": {
                 "pages": "4-299",
+                "top-left": ["115", "738"],
+                "bottom-right": ["528", "57"]
+            }
+        }
+    },
+    "2020": {
+        "parse": {
+            "start": {
+                "pages": "112",
+                "top-left": ["115", "528"],
+                "bottom-right": ["528", "57"]
+            },
+            "end": {
+                "pages": "402",
+                "top-left": ["115", "738"],
+                "bottom-right": ["528", "482"]
+            },
+            "full": {
+                "pages": "113-401",
                 "top-left": ["115", "738"],
                 "bottom-right": ["528", "57"]
             }
