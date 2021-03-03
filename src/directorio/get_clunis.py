@@ -29,7 +29,6 @@ def get_clunis(
     , status=['ACTIVA', 'INACTIVA']
     , representation=['VIGENTE', 'VENCIDA']
     ):
-    
     logger.info('Getting CLUNI directory')
     logger.info('Checking if directory already exists')
     
@@ -41,12 +40,11 @@ def get_clunis(
             n_files = len(files)
         except Exception as e:
             logger.error('sirfosc directory not found')
-
     
     if n_files == 1: 
         logger.info('One directory found, loading data from it')
         file = str(files[0])
-
+    
     elif n_files > 1: 
         logger.info('Multiple directories found, loading data from most recent')
         dts = [to_datetime(dt[-23:-4] \
@@ -63,29 +61,23 @@ def get_clunis(
             'No CLUNI directories found, downloading from SIRFOSC'
             , exc_info=False
             )
-
+        
         try:
-            df, now = get_clunis_from_sirfosc('../resources/data/sirfosc/txt/')
+            df, now, file = get_clunis_from_sirfosc('../resources/data/sirfosc/txt/')
+            file = f'../resources/data/sirfosc/csv/report-rfosc-{now}.csv'
         except Exception as e:
             logger.error('something occurred when talking to sirfosc server')
-        
-        file = f'../resources/data/sirfosc/csv/report-rfosc-{now}.csv'
-        
+    
         try:
             df.to_csv(file)
+            logger.info(f'Data loaded from response, saved at: {file}')
         except Exception as e:
             logger.error('directory creation (csv) failed')
-        
-        logger.info(
-            f'Data loaded from response, saved at: {file}'
-            )
-
-        
+    
     df = read_csv(file, low_memory=False).iloc[:, 1:]                           # drop index from csv file
     logger.info(f'Data loaded from directory: {file}')
-
     
-    logger.info('Applying filtering, cleaning and formatting')
+    logger.info('Applying filters, cleaning and formatting')
     df_cluni = df[
         df['ESTATUS'].isin(status)                                              # filter osc by cluni status
         & df['ESTATUS DE LA REPRESENTACION'].isin(representation)               # filter osc by rfosc representation
@@ -95,7 +87,7 @@ def get_clunis(
     
     if columns is None:                                                         # cleaning and formatting
         with open("./format/df_cluni.json", "r") as f: c = load(f)
-
+    
     col_names = c['cols'].keys()
     new_col_names = [(k, v['name']) for k, v in c['cols'].items()]
     new_col_types = [(k, v['type']) for k, v in c['cols'].items() \
@@ -105,17 +97,14 @@ def get_clunis(
     
     for k, v in c['cols'].items():
         if v['type'] == 'date': df_cluni[k] = to_datetime(df_cluni[k])          # todo: there's better way to this with multiple columns?
-
     
     cols_to_lower = [k for k, v in c['cols'].items() if v['lower']]             # to lower values from certain columns
     df_cluni[cols_to_lower] = \
         df_cluni[cols_to_lower].apply(lambda c: c.str.lower())
-
+    
     logger.info('Renaming columns and preparing dataset')
     df_cluni = df_cluni[col_names].rename(columns=dict(new_col_names))          # rename columns
     
     logger.info('CLUNI direectory created\n')
-
+    
     return(df_cluni)
-
-
