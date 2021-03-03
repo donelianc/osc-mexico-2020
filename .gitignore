@@ -1,5 +1,6 @@
 *.DS_Store
 *.xls
+*.xlsx
 *.csv
 *.txt
 *.log
