@@ -8,7 +8,7 @@ from pandas import read_csv
 from pandas import to_datetime
 from datetime import datetime as dt
 
-from helpers.get_clunis_from_sirfosc import *
+from helpers.helpers import *
 
 
 logger = logging.getLogger('cluni')
@@ -30,49 +30,14 @@ def get_clunis(
     , representation=['VIGENTE', 'VENCIDA']
     ):
     logger.info('Getting CLUNI directory')
-    logger.info('Checking if directory already exists')
-    
-    if from_sirfosc:
-        n_files = 0
-    else:
-        try:
-            files = glob('../resources/data/sirfosc/csv/*.csv')
-            n_files = len(files)
-        except Exception as e:
-            logger.error('sirfosc directory not found')
-    
-    if n_files == 1: 
-        logger.info('One directory found, loading data from it')
-        file = str(files[0])
-    
-    elif n_files > 1: 
-        logger.info('Multiple directories found, loading data from most recent')
-        dts = [to_datetime(dt[-23:-4] \
-            , format='%Y-%m-%d-%H-%M-%S') for dt in files]
-        recent_file = max(dts)
-        file = (
-            '../resources/data/sirfosc/csv/report-rfosc-' 
-            + str(recent_file).replace(' ', '-').replace(':', '-') 
-            + '.csv'
-            )
-    
-    else:
-        logger.info(
-            'No CLUNI directories found, downloading from SIRFOSC'
-            , exc_info=False
-            )
-        
-        try:
-            df, now, file = get_clunis_from_sirfosc('../resources/data/sirfosc/txt/')
-            file = f'../resources/data/sirfosc/csv/report-rfosc-{now}.csv'
-        except Exception as e:
-            logger.error('something occurred when talking to sirfosc server')
-    
-        try:
-            df.to_csv(file)
-            logger.info(f'Data loaded from response, saved at: {file}')
-        except Exception as e:
-            logger.error('directory creation (csv) failed')
+    files = check_sources(
+        from_sirfosc
+        , '../resources/data/sirfosc/csv/' 
+        , '.csv'
+        , logger
+        )
+
+    file = get_source('clunis', files, '../resources/data/sirfosc/', '.csv', logger)
     
     df = read_csv(file, low_memory=False).iloc[:, 1:]                           # drop index from csv file
     logger.info(f'Data loaded from directory: {file}')

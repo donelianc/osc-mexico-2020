@@ -19,7 +19,7 @@ def get_clunis_from_sirfosc(path, save_response=True, filters=None):
         now = str(dt.now())[:19].replace(' ', '-').replace(':', '-')
 
         if save_response:
-            with open(path + f'report-rfosc-{now}.txt', "w+") as f:
+            with open(path + f'/txt/' + f'{now}.txt', "w+") as f:
                 f.write(response.text)
         
         df = DataFrame([row.split('","') for row in response.text.split('\n')])
