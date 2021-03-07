@@ -4,7 +4,6 @@ import logging
 
 from pandas import read_csv
 from pandas import to_datetime
-from datetime import datetime as dt
 
 from helpers.helpers import *
 
