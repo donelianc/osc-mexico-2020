@@ -1,7 +1,5 @@
 from glob import glob
 from pandas import to_datetime
-
-from helpers.get_clunis_from_sirfosc import *
 from helpers.get_donauts_from_sat import *
 
 def check_sources(from_source, dir_path, extension, log):
@@ -52,12 +50,13 @@ def get_source(source, fs, path, extension, log):
             if source == 'clunis':
                 df, now = get_clunis_from_sirfosc(path, extension)
                 file = f'{path}{extension[1:]}/{now}{extension}'
-            elif source == 'donaut-sat':
+            elif source == 'donauts-sat':
                 df, now = get_donauts_from_sat(path[-5:-1], path)
                 file = f'{path}/{now}{extension}'
         
         except Exception as e:
             log.error('something occurred when talking to the server')
+            raise(e)
     
         try:
             df.to_csv(file)

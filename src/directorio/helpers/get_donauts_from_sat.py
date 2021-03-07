@@ -44,7 +44,7 @@ def get_donauts_from_sat(year, dir_path, save_response=True, filters=None):
         
         now = str(dt.now())[:19].replace(' ', '-').replace(':', '-')
 
-        file_path = f'report-sat-{str_year}-{now}{extension}'
+        file_path = f'{str_year}-{now}{extension}'
 
         if save_response:
             with open(dir_path + file_path, "wb") as f:
