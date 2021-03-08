@@ -1,0 +1,14 @@
+*.DS_Store
+*.xls
+*.xlsx
+*.csv
+*.txt
+*.log
+*.pdf
+*.code-workspace
+
+.vscode/
+.ipynb_checkpoints/
+
+**/__pycache__
+**/test
