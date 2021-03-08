@@ -1,6 +1,14 @@
 *.DS_Store
 *.xls
+*.xlsx
+*.csv
+*.txt
+*.log
+*.pdf
+*.code-workspace
 
+.vscode/
 .ipynb_checkpoints/
-data/SIRFOSC/*
-data/A14-RMS/test/*
+
+**/__pycache__
+**/test
