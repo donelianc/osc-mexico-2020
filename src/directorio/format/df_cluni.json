@@ -1,0 +1,40 @@
+{
+    "type": "pandas.dataframe", 
+    "cols": {
+        "RFC": {
+            "name": "rfc"
+            , "type": "str"
+            , "lower": false
+        }
+        , "CLUNI": {
+            "name": "cluni"
+            , "type": "str"
+            , "lower": false
+        }
+        , "RAZON SOCIAL": {
+            "name": "cluni_razon_social"
+            , "type": "str"
+            , "lower": false
+        }
+        , "ESTATUS": {
+            "name": "cluni_status"
+            , "type": "str"
+            , "lower": true
+        }
+        , "ESTATUS DE LA REPRESENTACION": {
+            "name": "cluni_representation"
+            , "type": "str"
+            , "lower": true
+        }
+        , "FIGURA JURIDICA": {
+            "name": "osc_legal_form"
+            , "type": "str"
+            , "lower": true
+        }
+        , "FECHA DE CONSTITUCION": {
+            "name": "created_at"
+            , "type": "date"
+            , "lower": false
+        }
+    }
+}
