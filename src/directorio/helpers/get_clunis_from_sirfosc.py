@@ -1,16 +1,23 @@
+from pathlib import Path
 from json import load
 from typing import NoReturn
 from requests import request
 from datetime import datetime as dt
 from pandas import DataFrame
+from os.path import isdir
+from os import makedirs
 
 
 def get_clunis_from_sirfosc(path, save_response=True, filters=None):
 
     if filters == None:
-        # use default parameters (check json file)
-        with open("./params/sirfosc.json", "r") as f:
-            params = load(f)
+        try:
+            # use default parameters (check json file)
+            with open("./params/sirfosc.json", "r") as f:
+                params = load(f)
+        except OSError as e:
+            print("Parameters in json file weren't found. Create it first.")
+            raise e
 
         BASE = "http://www.sii.gob.mx/portal/organizaciones/excel/?"
         PARAMS = "&".join([p.lower() + "=" + params[p] for p in params.keys()])
@@ -19,7 +26,10 @@ def get_clunis_from_sirfosc(path, save_response=True, filters=None):
         now = str(dt.now())[:19].replace(" ", "-").replace(":", "-")
 
         if save_response:
-            with open(path + f"/txt/" + f"{now}.txt", "w+") as f:
+            Path(path + "/txt/").mkdir(parents=True, exist_ok=True)
+            if not isdir(path + "/txt/"):
+                makedirs(path)
+            with open(path + "/txt/" + f"{now}.txt", "w+") as f:
                 f.write(response.text)
 
         df = DataFrame([row.split('","') for row in response.text.split("\n")])

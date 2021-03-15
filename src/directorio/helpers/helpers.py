@@ -1,24 +1,26 @@
+from pathlib import Path
 from glob import glob
-from pandas import to_datetime, DataFrame
+from pandas import to_datetime
 from helpers.get_clunis_from_sirfosc import *
 from helpers.get_donauts_from_sat import *
 from helpers.get_donauts_from_dof import *
 
 
-def check_sources(from_source, dir_path, extension, log):
+def check_sources(from_source, path, extension, log):
 
-    log.info("Checking if directory already exists")
-    assert dir_path[-1] == "/", "make sure path ends with /"
+    log.info("Checking if directorio already exists")
+    assert path[-1] == "/", "make sure path ends with /"
     assert extension[0] == ".", "make extension starts with ."
 
-    check = dir_path + "*" + extension
+    Path(path).mkdir(parents=True, exist_ok=True)
+    full_path = path + "*" + extension
 
     if from_source:
         log.info("Directory will be created from source")
         return []
     else:
         try:
-            fs = glob(check)
+            fs = glob(full_path)
             log.info(f"{len(fs)} source(s) were found")
         except Exception as e:
             log.error("no directory not found")

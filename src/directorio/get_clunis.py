@@ -5,6 +5,7 @@ from json import load
 from pandas import read_csv
 from pandas import to_datetime
 
+from pathlib import Path
 from helpers.helpers import *
 
 
@@ -27,12 +28,17 @@ def get_clunis(
     status=["ACTIVA", "INACTIVA"],
     representation=["VIGENTE", "VENCIDA"],
 ):
-    logger.info("Getting CLUNI directory")
-    files = check_sources(
-        from_sirfosc, "../resources/data/sirfosc/csv/", ".csv", logger
-    )
 
-    file = get_source("clunis", files, "../resources/data/sirfosc/", ".csv", logger)
+    logger.info("Getting CLUNI directory")
+
+    DATA_PATH = "./resources/data/sirfosc/"
+    FORMAT_PATH = "./format/"
+
+    Path(DATA_PATH).mkdir(parents=True, exist_ok=True)
+
+    files = check_sources(from_sirfosc, DATA_PATH + "csv/", ".csv", logger)
+
+    file = get_source("clunis", files, DATA_PATH, ".csv", logger)
 
     df = read_csv(file, low_memory=False).iloc[:, 1:]  # drop index from csv file
     logger.info(f"Data loaded from directory: {file}")
@@ -50,6 +56,7 @@ def get_clunis(
     df_cluni = df_cluni.reset_index(drop=True)  # reset index due to removing entries
 
     if columns is None:  # cleaning and formatting
+        Path(FORMAT_PATH).mkdir(parents=True, exist_ok=True)
         with open("./format/df_cluni.json", "r") as f:
             c = load(f)
 
