@@ -5,11 +5,12 @@
 *.txt
 *.log
 *.pdf
-*.ipynb
-*.code-workspace
 
-.vscode/
-.ipynb_checkpoints/
-
+**/.ipynb_checkpoints/
 **/__pycache__
 **/test
+
+/notebooks/research/format
+/notebooks/research/logs
+/notebooks/research/params
+/notebooks/research/resources/*
