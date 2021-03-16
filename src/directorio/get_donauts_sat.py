@@ -24,13 +24,12 @@ def get_donauts_sat(year=2020, from_sat=False):
 
     logger.info("Getting Donatarias Autorizadas directory from SAT")
 
-    files = check_sources(
-        from_sat, f"../resources/data/donaut-sat/csv/{year}/", ".csv", logger
-    )
+    DATA_PATH = "./resources/data/donaut-sat/"
+    Path(DATA_PATH).mkdir(parents=True, exist_ok=True)
 
-    file = get_source(
-        "donauts-sat", files, f"../resources/data/donaut-sat/{year}/", ".csv", logger
-    )
+    files = check_sources(from_sat, DATA_PATH + f"csv/{year}", ".csv", logger)
+
+    file = get_source("donauts-sat", files, DATA_PATH + f"{year}", ".csv", logger)
 
     df = read_csv(file, low_memory=False).iloc[:, 1:]  # drop index from csv file
     logger.info(f"Data loaded from directory: {file}")
@@ -50,7 +49,7 @@ def get_donauts_sat(year=2020, from_sat=False):
         df_donaut_sat.fecha_oficio_sat
     )
 
-    df_donaut_sat.loc[:, "sat_year"] = str(year)
+    df_donaut_sat["sat_year"] = str(year)
 
     logger.info("Donatarias Autorizadas directory created\n")
 

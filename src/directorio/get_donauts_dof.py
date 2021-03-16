@@ -2,7 +2,7 @@
 import logging
 
 from pandas import read_csv
-from pandas import to_datetime
+from pathlib import Path
 
 from helpers.helpers import *
 
@@ -25,22 +25,21 @@ logger.addHandler(fh)
 def get_donauts_dof(year=2020, from_dof=False):
 
     logger.info("Getting Donatarias Autorizadas directory from DOF")
+    DATA_PATH = "./resources/data/donaut-dof/"
+    Path(DATA_PATH).mkdir(parents=True, exist_ok=True)
 
-    files = check_sources(
-        from_dof, f"../resources/data/donaut-dof/csv/{year}/", ".csv", logger
-    )
+    files = check_sources(from_dof, DATA_PATH + f"csv/{year}/", ".csv", logger)
 
     file = get_source(
         "donauts-dof",
         files,
-        f"../resources/data/donaut-dof/pdf/{year}/",
+        DATA_PATH + f"pdf/{year}/",
         ".csv",
         logger,
     )
 
-    df_donaut_dof = read_csv(file, low_memory=False).iloc[
-        :, 1:
-    ]  # drop index from csv file
+    # drop index from csv file
+    df_donaut_dof = read_csv(file, low_memory=False).iloc[:, 1:]
     logger.info(f"Data loaded from directory: {file}")
 
     logger.info("Applying filters, cleaning and formatting")
@@ -80,7 +79,9 @@ def get_donauts_dof(year=2020, from_dof=False):
     df_donaut_dof = df_donaut_dof.drop_duplicates("RFC").reset_index(drop=True)
     df_donaut_dof = df_donaut_dof.drop(columns=["merge_needed"])
 
-    df_donaut_dof.loc[:, "dof_year"] = str(year)
+    df_donaut_dof.loc[
+        :,
+    ] = str(year)
 
     logger.info("Donatarias Autorizadas directory created\n")
 

@@ -4,8 +4,6 @@ from typing import NoReturn
 from requests import request
 from datetime import datetime as dt
 from pandas import DataFrame
-from os.path import isdir
-from os import makedirs
 
 
 def get_clunis_from_sirfosc(path, save_response=True, filters=None):

@@ -1,3 +1,4 @@
+from pathlib import Path
 from json import load
 from typing import NoReturn
 
@@ -10,7 +11,7 @@ from datetime import datetime as dt
 from pandas import read_excel
 
 
-def get_donauts_from_sat(year, dir_path, save_response=True, filters=None):
+def get_donauts_from_sat(year, path, save_response=True, filters=None):
 
     year
 
@@ -50,11 +51,12 @@ def get_donauts_from_sat(year, dir_path, save_response=True, filters=None):
         file_path = f"{year}-{now}{extension}"
 
         if save_response:
-            with open(dir_path + file_path, "wb") as f:
+            Path(path).mkdir(parents=True, exist_ok=True)
+            with open(path + file_path, "wb") as f:
                 f.write(response.content)
 
         df = read_excel(
-            dir_path + file_path,
+            path + file_path,
             skiprows=range(params[year]["skip_rows"][0], params[year]["skip_rows"][1]),
             usecols=params[year]["usecols"],
         )

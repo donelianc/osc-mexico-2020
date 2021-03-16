@@ -35,7 +35,7 @@ def get_source(source, fs, path, extension, log):
         "clunis",
         "donauts-sat",
         "donauts-dof",
-    ], "Only ['clunis', 'donauts-sat'] are available"
+    ], "Only ['clunis', 'donauts-sat', 'donauts-dof'] are available"
     assert isinstance(fs, list), "files isn't a list"
 
     n = len(fs)
@@ -62,10 +62,10 @@ def get_source(source, fs, path, extension, log):
                 file = f"{path}{extension[1:]}/{now}{extension}"
             elif source == "donauts-sat":
                 df, now = get_donauts_from_sat(path[-5:-1], path)
-                file = f"{path}/{now}{extension}"
+                file = f"{path}{now}{extension}"
             elif source == "donauts-dof":
                 df, now = get_donauts_from_dof(path[-5:-1], path)
-                file = f"{path}/{now}{extension}".replace("pdf", extension[1:])
+                file = f"{path}{now}{extension}".replace("pdf", extension[1:])
 
         except Exception as e:
             log.error("something occurred when talking to the server")

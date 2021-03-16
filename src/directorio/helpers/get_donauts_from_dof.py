@@ -1,5 +1,6 @@
 from json import load
 from time import sleep
+from pathlib import Path
 from requests import get
 from typing import NoReturn
 from camelot import read_pdf
@@ -34,7 +35,7 @@ def fix_multiple_cols_name(df):
         return DataFrame(columns=[0, 1])
 
 
-def get_donauts_from_dof(year, dir_path, save_response=True, filters=None):
+def get_donauts_from_dof(year, path, save_response=True, filters=None):
     if filters == None:
         with open("./params/dof-rmf.json", "r") as f:
             params = load(f)
@@ -44,7 +45,8 @@ def get_donauts_from_dof(year, dir_path, save_response=True, filters=None):
         URL = f"https://www.dof.gob.mx/abrirPDF.php?\
             archivo={publish_date}-{edition}.pdf&anio={year}&repo=repositorio/"
 
-        now, file_path = download_file(year, URL, dir_path)
+        Path(path).mkdir(parents=True, exist_ok=True)
+        now, file_path = download_file(year, URL, path)
 
         #  parse pdf to dataframe using camelot
         df = DataFrame(columns=[0, 1])
@@ -85,7 +87,7 @@ def get_donauts_from_dof(year, dir_path, save_response=True, filters=None):
             pages=last,
         )
 
-        df_donaut_rms = concat([df, fix_multiple_cols_name(last_page[0].df)])
+        df = concat([df, fix_multiple_cols_name(last_page[0].df)])
 
         for n in range(len(full_pages)):
             aux = fix_multiple_cols_name(full_pages[n].df)
