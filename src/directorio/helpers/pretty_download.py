@@ -1,3 +1,4 @@
+from requests import exceptions
 from tqdm import tqdm
 from retry import retry
 from pathlib import Path
@@ -11,11 +12,11 @@ from requests.adapters import HTTPAdapter
 
 # ===== from: https://stackoverflow.com/a/63831244 ===== #
 # ===== from: https://stackoverflow.com/a/35504626 ===== #
-@retry((ReadTimeoutError, Timeout), tries=5, delay=1, backoff=2, max_delay=20)
+@retry(Exception, tries=5, delay=1, backoff=3)
 def pretty_download(url, path, log):
     s = Session()
     retries = Retry(
-        total=5,
+        total=8,
         backoff_factor=2,
         status_forcelist=[408, 500, 502, 503, 504, 599],
     )
@@ -28,11 +29,11 @@ def pretty_download(url, path, log):
 
     try:
         r = s.get(url, headers=headers, stream=True, allow_redirects=True, timeout=5)
-    except Timeout as out:
+    except Exception as e:
         log.info(
             "Server timeout (60 secods) after no response. Download process was canceled"
         )
-        raise out
+        raise e
 
     if r.status_code != 200:
         r.raise_for_status()  # Will only raise for 4xx codes, so...
@@ -47,8 +48,12 @@ def pretty_download(url, path, log):
     desc = "(Unknown total file size)" if file_size == 0 else ""
     r.raw.read = partial(r.raw.read, decode_content=True)  # Decompress if needed
 
-    with tqdm.wrapattr(r.raw, "read", total=file_size, desc=desc) as r_raw:
-        with path.open("wb") as f:
-            copyfileobj(r_raw, f)
+    try:
+        with tqdm.wrapattr(r.raw, "read", total=file_size, desc=desc) as r_raw:
+            with path.open("wb") as f:
+                copyfileobj(r_raw, f)
+    except Exception as e:
+        log.info("During copyfile no data was received. Download process was canceled.")
+        raise e
 
     return str(path)
