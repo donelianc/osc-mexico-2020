@@ -9,9 +9,12 @@
 			"anio",
 			"archivo",
 			"edicion",
+			"numpy",
 			"publicacion",
 			"repositorio",
-			"sirfosc"
+			"sirfosc",
+			"tqdm",
+			"wrapattr"
 		]
 	}
 }
