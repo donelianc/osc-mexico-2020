@@ -1,12 +1,14 @@
 from pathlib import Path
 from json import load
 from typing import NoReturn
-from requests import request
 from datetime import datetime as dt
-from pandas import DataFrame
+from pandas import read_csv
+from numpy import nan
+
+from helpers.pretty_download import pretty_download
 
 
-def get_clunis_from_sirfosc(path, save_response=True, filters=None):
+def get_clunis_from_sirfosc(dir_path, log, filters=None):
 
     if filters == None:
         try:
@@ -20,23 +22,33 @@ def get_clunis_from_sirfosc(path, save_response=True, filters=None):
         BASE = "http://www.sii.gob.mx/portal/organizaciones/excel/?"
         PARAMS = "&".join([p.lower() + "=" + params[p] for p in params.keys()])
 
-        response = request("GET", BASE + PARAMS)
         now = str(dt.now())[:19].replace(" ", "-").replace(":", "-")
+        file_name = f"{now}.txt"
 
-        if save_response:
-            Path(path + "/txt/").mkdir(parents=True, exist_ok=True)
-            if not isdir(path + "/txt/"):
-                makedirs(path)
-            with open(path + "/txt/" + f"{now}.txt", "w+") as f:
-                f.write(response.text)
+        Path(dir_path).mkdir(parents=True, exist_ok=True)
+        Path(dir_path.replace("txt", "csv")).mkdir(parents=True, exist_ok=True)
+        out_path = pretty_download(
+            url=BASE + PARAMS, path=dir_path + file_name, log=log
+        )
 
-        df = DataFrame([row.split('","') for row in response.text.split("\n")])
-        df[0] = df[0].str.replace('"', "")
-        df[df.shape[1] - 1] = df[df.shape[1] - 1].str.replace('"\r', "")
-        df = df.rename(columns=df.iloc[0]).iloc[1:]
-        df = df[:-1].reset_index(drop=True)
+        df = read_csv(
+            out_path,
+            delimiter='","',
+            encoding="latin-1",
+            engine="python",
+        )
 
-        return (df, now)
+        df[df.columns[0]] = df[df.columns[0]].str.replace('"', "")
+        df[df.columns[-1]] = (
+            df[df.columns[-1]]
+            .str.replace('"', "")
+            .str.replace('"\r', "")
+            .replace("NA", nan)
+        )
+
+        df.columns = [col.replace('"', "") for col in df.columns]
+
+        return (df, out_path)
 
     else:
         # TODO: build function to retrieve GET request using user's parameters

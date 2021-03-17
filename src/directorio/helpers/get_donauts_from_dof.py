@@ -1,22 +1,10 @@
 from json import load
-from time import sleep
 from pathlib import Path
-from requests import get
 from typing import NoReturn
 from camelot import read_pdf
 from datetime import datetime as dt
-from shutil import copyfileobj
 from pandas import DataFrame, concat
-
-
-def download_file(year, url, path):
-    now = str(dt.now())[:19].replace(" ", "-").replace(":", "-")
-    file_path = f"{now}.pdf"
-    with get(url, stream=True) as r:
-        with open(path + file_path, "wb") as f:
-            copyfileobj(r.raw, f)
-
-    return (now, path + file_path)
+from helpers.pretty_download import pretty_download
 
 
 def fix_multiple_cols_name(df):
@@ -35,7 +23,7 @@ def fix_multiple_cols_name(df):
         return DataFrame(columns=[0, 1])
 
 
-def get_donauts_from_dof(year, path, save_response=True, filters=None):
+def get_donauts_from_dof(year, path, log, filters=None):
     if filters == None:
         with open("./params/dof-rmf.json", "r") as f:
             params = load(f)
@@ -45,8 +33,14 @@ def get_donauts_from_dof(year, path, save_response=True, filters=None):
         URL = f"https://www.dof.gob.mx/abrirPDF.php?\
             archivo={publish_date}-{edition}.pdf&anio={year}&repo=repositorio/"
 
+        now = str(dt.now())[:19].replace(" ", "-").replace(":", "-")
+        file_name = f"{now}.pdf"
+
+        path += f"{year}/"
+
         Path(path).mkdir(parents=True, exist_ok=True)
-        now, file_path = download_file(year, URL, path)
+        Path(path.replace("pdf", "csv")).mkdir(parents=True, exist_ok=True)
+        out_path = pretty_download(URL, path + file_name, log)
 
         #  parse pdf to dataframe using camelot
         df = DataFrame(columns=[0, 1])
@@ -57,7 +51,7 @@ def get_donauts_from_dof(year, path, save_response=True, filters=None):
         start_br = params[year]["parse"]["start"]["bottom-right"]
 
         first_page = read_pdf(
-            file_path,
+            out_path,
             flavor="stream",
             table_areas=[",".join(start_tl + start_br)],
             pages=first,
@@ -70,7 +64,7 @@ def get_donauts_from_dof(year, path, save_response=True, filters=None):
         full_tl = params[year]["parse"]["full"]["top-left"]
         full_br = params[year]["parse"]["full"]["bottom-right"]
         full_pages = read_pdf(
-            file_path,
+            out_path,
             flavor="stream",
             table_areas=[",".join(full_tl + full_br)],
             pages=full,
@@ -81,7 +75,7 @@ def get_donauts_from_dof(year, path, save_response=True, filters=None):
         end_tl = params[year]["parse"]["end"]["top-left"]
         end_br = params[year]["parse"]["end"]["bottom-right"]
         last_page = read_pdf(
-            file_path,
+            out_path,
             flavor="stream",
             table_areas=[",".join(end_tl + end_br)],
             pages=last,
@@ -95,7 +89,7 @@ def get_donauts_from_dof(year, path, save_response=True, filters=None):
 
         df = df.rename(columns={0: "RFC", 1: "sat_razon_social"})
 
-        return (df, now)
+        return (df, out_path)
 
     else:
         # TODO: build function to retrieve GET request using user's parameters

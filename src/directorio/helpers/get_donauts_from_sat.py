@@ -1,19 +1,16 @@
-from pathlib import Path
 from json import load
+from pathlib import Path
 from typing import NoReturn
 
-from requests import get
-from requests import Session
-from urllib3.util.retry import Retry
-from requests.adapters import HTTPAdapter
+from requests import exceptions
+
+from helpers.pretty_download import pretty_download
 
 from datetime import datetime as dt
 from pandas import read_excel
 
 
-def get_donauts_from_sat(year, path, save_response=True, filters=None):
-
-    year
+def get_donauts_from_sat(year, path, filters=None, log=None):
 
     if filters == None:
         # use default parameters (check json file)
@@ -24,46 +21,32 @@ def get_donauts_from_sat(year, path, save_response=True, filters=None):
 
         BASE = params[year]["base_url"]
         URL = BASE + year + extension
-
-        response = get(URL)
-
-        # TODO: SAT serve might be so unstable, need to handle 500 errors
-        # ===== from: https://stackoverflow.com/a/35504626 ===== #
-        #        headers = {
-        #             'Upgrade-Insecure-Requests': '1'
-        #             , 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'
-        #             , 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
-        #            }
-        #
-        #        s = Session()
-        #        retries = Retry(
-        #            total=5
-        #            , backoff_factor=1
-        #            , status_forcelist=[ 500, 502, 503, 504 ]
-        #            )
-        #
-        #        s.mount('http://', HTTPAdapter(max_retries=retries))
-        #        response = s.get(URL, headers=headers)
-        # ===== end ===== #
+        log.info(f"Download directorio from SAT using: {URL}")
 
         now = str(dt.now())[:19].replace(" ", "-").replace(":", "-")
+        file_name = f"{year}-{now}{extension}"
 
-        file_path = f"{year}-{now}{extension}"
+        path += f"{year}/"
 
-        if save_response:
-            Path(path).mkdir(parents=True, exist_ok=True)
-            with open(path + file_path, "wb") as f:
-                f.write(response.content)
+        Path(path).mkdir(parents=True, exist_ok=True)
+        Path(path.replace("sheet", "csv")).mkdir(parents=True, exist_ok=True)
+        out_path = pretty_download(url=URL, path=path + file_name, log=log)
 
-        df = read_excel(
-            path + file_path,
-            skiprows=range(params[year]["skip_rows"][0], params[year]["skip_rows"][1]),
-            usecols=params[year]["usecols"],
-        )
+        try:
+            df = read_excel(
+                path + file_name,
+                skiprows=range(
+                    params[year]["skip_rows"][0], params[year]["skip_rows"][1]
+                ),
+                usecols=params[year]["usecols"],
+            )
+        except Exception as e:
+            log.error("Something occurred when talking to the server.")
+            raise e
 
         df = df.rename(columns=df.iloc[0]).iloc[1:].reset_index(drop=True)
 
-        return (df, now)
+        return (df, out_path)
 
     else:
         # todo: build function to retrieve GET request using user's parameters
