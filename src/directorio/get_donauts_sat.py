@@ -20,18 +20,17 @@ fh.setFormatter(formatter)
 logger.addHandler(fh)
 
 
-def get_donauts_sat(year=2020, from_sat=False):
+def get_donauts_sat(year="2020", from_sat=False):
 
     logger.info("Getting Donatarias Autorizadas directory from SAT")
 
     DATA_PATH = "./resources/data/donaut-sat/"
     Path(DATA_PATH).mkdir(parents=True, exist_ok=True)
 
-    files = check_sources(from_sat, DATA_PATH + f"csv/{year}", ".csv", logger)
+    files = check_sources(from_sat, DATA_PATH, "csv", logger, year=year)
 
-    file = get_source("donauts-sat", files, DATA_PATH + f"{year}", ".csv", logger)
+    df, file = get_source("donauts-sat", files, DATA_PATH, "sheet", "csv", logger, year)
 
-    df = read_csv(file, low_memory=False).iloc[:, 1:]  # drop index from csv file
     logger.info(f"Data loaded from directory: {file}")
 
     logger.info("Applying filters, cleaning and formatting")

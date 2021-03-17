@@ -36,11 +36,10 @@ def get_clunis(
 
     Path(DATA_PATH).mkdir(parents=True, exist_ok=True)
 
-    files = check_sources(from_sirfosc, DATA_PATH + "csv/", ".csv", logger)
+    files = check_sources(from_sirfosc, DATA_PATH, "csv", logger)
 
-    file = get_source("clunis", files, DATA_PATH, ".csv", logger)
+    df, file = get_source("clunis", files, DATA_PATH, "txt", "csv", logger)
 
-    df = read_csv(file, low_memory=False).iloc[:, 1:]  # drop index from csv file
     logger.info(f"Data loaded from directory: {file}")
 
     logger.info("Applying filters, cleaning and formatting")
@@ -57,7 +56,7 @@ def get_clunis(
 
     if columns is None:  # cleaning and formatting
         Path(FORMAT_PATH).mkdir(parents=True, exist_ok=True)
-        with open("./format/df_cluni.json", "r") as f:
+        with open("./format/cluni.json", "r") as f:
             c = load(f)
 
     col_names = c["cols"].keys()
