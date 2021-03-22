@@ -60,6 +60,7 @@ def get_donauts_dof(year="2020", from_dof=False):
     df = df.drop(columns=["merge_needed"])
 
     df["dof_year"] = str(year)
+    df.columns = df.columns.str.lower()
 
     logger.info("Donatarias Autorizadas directory created\n")
 

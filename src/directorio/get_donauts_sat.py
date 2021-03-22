@@ -34,21 +34,22 @@ def get_donauts_sat(year="2020", from_sat=False):
     logger.info(f"Data loaded from directory: {file}")
 
     logger.info("Applying filters, cleaning and formatting")
-    df_donaut_sat = df.drop_duplicates("RFC")[  #  drop duplicates for RFC and renaming
+    df = df.drop_duplicates("RFC")[  #  drop duplicates for RFC and renaming
         ["RFC", "FECHA DE OFICIO"]
     ].rename(columns={"RFC": "rfc", "FECHA DE OFICIO": "fecha_oficio_sat"})
 
-    df_donaut_sat = df_donaut_sat[  # removing osc with bad formatted rfc
-        df_donaut_sat.rfc.str.len().isin([12, 13])
+    df = df[  # removing osc with bad formatted rfc
+        df.rfc.str.len().isin([12, 13])
     ].reset_index(drop=True)
 
-    df_donaut_sat[
+    df[
         "fecha_oficio_sat"
     ] = to_datetime(  # TODO: formating and data cleaning for entire dataset
-        df_donaut_sat.fecha_oficio_sat
+        df.fecha_oficio_sat
     )
 
-    df_donaut_sat["sat_year"] = str(year)
+    df["sat_year"] = str(year)
+    df.columns = df.columns.str.lower()
 
     logger.info("Donatarias Autorizadas directory created\n")
 
